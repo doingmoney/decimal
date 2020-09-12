@@ -1,5 +1,5 @@
 # decimal
-handle the accuracy of decimal
+handle the decimal precise
 
 export five methods
 
