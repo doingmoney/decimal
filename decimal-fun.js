@@ -203,12 +203,26 @@ const plus = function (prev, beminus, opt) {
     newa = result.newa
     new_wei = result.new_wei
 
-    new_wei = getRealWei(new_wei, maxlen, wei_base)
-    newval = newa + '.' + new_wei
-    if (negative && Number(newval) > 0) newval = '-' + newval
-    if (newval[newval.length - 1] == '0') {
-      newval = newval.substring(0, newval.length - 1)
+    let new_len = (new_wei + '').length
+    if (new_len && new_len - maxlen) {
+      let prev = (new_wei + '').slice(0, new_len - maxlen)
+      let next = (new_wei + '').slice(new_len - maxlen)
+      newa += Number(prev)
+      new_wei = Number(next)
     }
+
+    if (!new_wei) {
+      newval = newa + ''
+    } else {
+      new_wei = getRealWei(new_wei, maxlen, wei_base)
+
+      newval = newa + '.' + new_wei
+      if (negative && Number(newval) > 0) newval = '-' + newval
+      if (newval[newval.length - 1] == '0') {
+        newval = newval.substring(0, newval.length - 1)
+      }
+    }
+
   }
 
   return newval
@@ -269,10 +283,34 @@ const divide = function (prev, beminus, opt) {
   return newval
 }
 
-export {
+const keepPrecise = function (num, p, opt) {
+  /*
+  num: 处理的数 Number
+  p: 保留的小数
+  opt: 备留拓展
+  */
+  p = p || 0
+  let val = num + ''
+  let dl = 0
+  if (val.indexOf('.') != -1) {
+    let ds = val.split('.')
+    dl = ds[1].length
+    if(p==0){
+      val = ds[0]
+    }else if(p<=dl){
+      ds[1] = ds[1].substring(0,p)
+      val = ds.join('.')
+    }
+  }
+
+  return val
+}
+
+export default {
   minus, // 两数相减
   plus, // 两数相加
   makePercent, // 乘100 转百分比
   times, // 两数相乘
   divide, // 两数相除
+  keepPrecise, // 保留小数位
 }
